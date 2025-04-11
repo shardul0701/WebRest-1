@@ -8,13 +8,13 @@ namespace WebRestAPI.Controllers.UD;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CustomerController : ControllerBase, iController<Customer>
+public class AddressController : ControllerBase, iController<Address>
 {
     private WebRestOracleContext _context;
     // Create a field to store the mapper object
     private readonly IMapper _mapper;
 
-    public CustomerController(WebRestOracleContext context, IMapper mapper)
+    public AddressController(WebRestOracleContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -25,8 +25,8 @@ public class CustomerController : ControllerBase, iController<Customer>
     public async Task<IActionResult> Get()
     {
 
-        List<Customer> lst = null;
-        lst = await _context.Customers.ToListAsync();
+        List<Address>? lst = null;
+        lst = await _context.Address.ToListAsync();
         return Ok(lst);
     }
 
@@ -35,7 +35,7 @@ public class CustomerController : ControllerBase, iController<Customer>
     [Route("Get/{ID}")]
     public async Task<IActionResult> Get(string ID)
     {
-        var itm = await _context.Customers.Where(x => x.CustomerId == ID).FirstOrDefaultAsync();
+        var itm = await _context.Address.Where(x => x.AddressId == ID).FirstOrDefaultAsync();
         return Ok(itm);
     }
 
@@ -44,36 +44,36 @@ public class CustomerController : ControllerBase, iController<Customer>
     [Route("Delete/{ID}")]
     public async Task<IActionResult> Delete(string ID)
     {
-        var itm = await _context.Customers.Where(x => x.CustomerId == ID).FirstOrDefaultAsync();
-        _context.Customers.Remove(itm);
+        var itm = await _context.Address.Where(x => x.AddressId == ID).FirstOrDefaultAsync();
+        _context.Address.Remove(itm);
         await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Customer _Customer)
+    public async Task<IActionResult> Put([FromBody] Address _Address)
     {
         var trans = _context.Database.BeginTransaction();
 
         try
         {
-            var itm = await _context.Customers.AsNoTracking()
-            .Where(x => x.CustomerId == _Customer.CustomerId)
+            var itm = await _context.Address.AsNoTracking()
+            .Where(x => x.AddressId == _Address.AddressId)
             .FirstOrDefaultAsync();
 
 
             if (itm != null)
             {
-                itm = _mapper.Map<Customer>(_Customer);
+                itm = _mapper.Map<Address>(_Address);
 
                  /*
-                        itm.CustomerFirstName = _Customer.CustomerFirstName;
-                        itm.CustomerMiddleName = _Customer.CustomerMiddleName;
-                        itm.CustomerLastName = _Customer.CustomerLastName;
-                        itm.CustomerDateOfBirth = _Customer.CustomerDateOfBirth;
-                        itm.CustomerGenderId = _Customer.CustomerGenderId;
+                        itm.AddressFirstName = _Address.AddressFirstName;
+                        itm.AddressMiddleName = _Address.AddressMiddleName;
+                        itm.AddressLastName = _Address.AddressLastName;
+                        itm.AddressDateOfBirth = _Address.AddressDateOfBirth;
+                        itm.AddressGenderId = _Address.AddressGenderId;
                    */      
-                _context.Customers.Update(itm);
+                _context.Address.Update(itm);
                 await _context.SaveChangesAsync();
                 trans.Commit();
 
@@ -90,14 +90,14 @@ public class CustomerController : ControllerBase, iController<Customer>
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Customer _Customer)
+    public async Task<IActionResult> Post([FromBody] Address _Address)
     {
         var trans = _context.Database.BeginTransaction();
 
         try
         {
-            _Customer.CustomerId = Guid.NewGuid().ToString().ToUpper().Replace("-", "");
-            _context.Customers.Add(_Customer);
+            _Address.AddressId = Guid.NewGuid().ToString().ToUpper().Replace("-", "");
+            _context.Address.Add(_Address);
             await _context.SaveChangesAsync();
             trans.Commit();
         }
